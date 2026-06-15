@@ -1,4 +1,8 @@
 import { ActivityPlaceholder } from "../activities/ActivityPlaceholder";
+import { AnimalDiscovery } from "../activities/AnimalDiscovery";
+import { BubblePop } from "../activities/BubblePop";
+import { Peekaboo } from "../activities/Peekaboo";
+import { TouchSparkle } from "../activities/TouchSparkle";
 import type { Activity } from "../types/activity";
 import { JOURNAL_DATA } from "./journalData";
 
@@ -17,7 +21,7 @@ export const ACTIVITY_REGISTRY: Activity[] = [
     minMonths: 6,
     maxMonths: 6,
     skills: ["Hand-eye coordination", "Finger exploration", "Cause and effect"],
-    component: placeholder("✨", "Touch & Sparkle", "Tap anywhere and see something delightful respond."),
+    component: TouchSparkle,
     journal: JOURNAL_DATA[6]
   },
   {
@@ -28,7 +32,7 @@ export const ACTIVITY_REGISTRY: Activity[] = [
     minMonths: 7,
     maxMonths: 7,
     skills: ["Reaching accuracy", "Tracking moving objects", "Anticipation"],
-    component: placeholder("🫧", "Bubble Pop", "Large bubbles invite reaching and discovery."),
+    component: BubblePop,
     journal: JOURNAL_DATA[7]
   },
   {
@@ -39,7 +43,7 @@ export const ACTIVITY_REGISTRY: Activity[] = [
     minMonths: 8,
     maxMonths: 8,
     skills: ["Language recognition", "Sound association", "Auditory memory"],
-    component: placeholder("🐄", "Animal Discovery", "Tap an animal card to hear and notice its sound."),
+    component: AnimalDiscovery,
     journal: JOURNAL_DATA[8]
   },
   {
@@ -50,7 +54,7 @@ export const ACTIVITY_REGISTRY: Activity[] = [
     minMonths: 9,
     maxMonths: 9,
     skills: ["Object permanence", "Anticipation", "Memory"],
-    component: placeholder("👀", "Peekaboo", "A gentle reveal creates surprise and recognition."),
+    component: Peekaboo,
     journal: JOURNAL_DATA[9]
   },
   {
