@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "LuminaKid",
+    "slug": "luminakid",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "luminakid",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#7F77DD",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "bundleIdentifier": "com.luminakid.app"
+    },
+    "android": {
+      "package": "com.luminakid.app"
+    },
+    "plugins": ["expo-router"]
+  }
+}
