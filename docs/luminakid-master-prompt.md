@@ -29,18 +29,23 @@ LuminaKid is a touch-first mobile application where the experience evolves month
 | Audio | expo-av | Play animal sounds, chimes, word recordings |
 | Haptics | expo-haptics | Tactile feedback on every touch |
 | Animations | React Native Reanimated v3 | Smooth, performant animations (bubbles, firefly, blooming) |
+| 3D Rendering | Three.js + React Three Fiber + Expo GL | Shared 3D animation layer for simple tactile scenes, characters, and depth effects across native and web |
 | Gestures | React Native Gesture Handler | Drag-and-drop for shape play and puzzles |
 | Date logic | date-fns | Age calculation and month comparison |
 
 ### Web App (Secondary / PWA)
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 14 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| Animation | Framer Motion |
-| Audio | Howler.js |
-| State | Zustand with localStorage persistence |
+| Layer | Technology | Reason |
+|---|---|---|
+| Framework | Expo Web + React Native Web | Reuse the same Expo Router screens, activity engine, and touch-first UI across iOS, Android, and web |
+| Language | TypeScript | Keep shared models, registry data, and activity logic type-safe |
+| Navigation | Expo Router static web export | Supports GitHub Pages deployment from the generated `dist/` output |
+| Styling | React Native StyleSheet/shared theme constants | Avoid maintaining a separate Tailwind/web-only design system |
+| Animation | React Native Reanimated + CSS-backed React Native Web behavior | Keep animation code shared where browser support allows it |
+| 3D Rendering | Three.js + React Three Fiber + Expo GL | Provide shared WebGL-powered 3D animation primitives for native and PWA builds |
+| Audio | Expo-compatible sound abstraction | Use native audio on mobile and graceful browser behavior on web |
+| State | Zustand with platform storage adapters | Persist baby profile and selected month locally on native and web |
+
+The web/PWA is a secondary output of the Expo app, not a separate Next.js application. Keep the architecture single-codebase unless a future requirement explicitly needs a dedicated web app.
 
 ### Backend (Optional — Phase 2)
 | Layer | Technology | Reason |
@@ -92,6 +97,11 @@ luminakid/
 │   │   ├── LockOverlay.tsx       # Shown on locked activities
 │   │   ├── JournalCard.tsx       # Reusable journal card
 │   │   └── StarBurst.tsx         # Reusable particle effect
+│   │
+│   ├── three/
+│   │   ├── ThreeCanvas.tsx       # Shared native/web 3D canvas wrapper
+│   │   ├── materials.ts          # Shared colors/material helpers
+│   │   └── scenes/               # Reusable 3D scenes for activity moments
 │   │
 │   ├── store/
 │   │   └── useBabyStore.ts       # Zustand store (baby profile, currentMonth)
@@ -764,12 +774,16 @@ npx expo install \
   expo-router \
   expo-notifications \
   expo-file-system \
+  expo-gl \
   react-native-reanimated \
   react-native-gesture-handler \
   @react-native-async-storage/async-storage \
   @react-native-community/datetimepicker \
   zustand \
   date-fns
+
+npm install three @react-three/fiber
+npm install --save-dev @types/three
 ```
 
 ### app.json (key fields)
@@ -799,10 +813,21 @@ npx expo install \
       "expo-router",
       "expo-av",
       ["expo-notifications", { "icon": "./assets/notification-icon.png" }]
-    ]
+    ],
+    "web": {
+      "output": "static"
+    }
   }
 }
 ```
+
+### GitHub Pages web/PWA build
+```bash
+# Export static web build for GitHub Pages
+npm run export:web
+```
+
+The GitHub Pages workflow should run tests, typecheck, export the Expo web build, upload `dist/`, and deploy it whenever the `main` branch changes.
 
 ### Build for stores
 ```bash
@@ -834,6 +859,8 @@ eas submit --platform android
 8. **No ads, no paywalls on core activities.** Keep the experience pure.
 9. **Auto-brightness consideration.** Reduce bright white flashes; use gentle pastel color shifts instead.
 10. **Screen time philosophy.** Journal tab should actively remind parents to put the phone down and do the real-world activity version.
+11. **Single-codebase web support.** The PWA must remain an Expo Web output of the React Native app unless a future phase explicitly approves a separate web application.
+12. **3D is supportive, not distracting.** Use Three.js for gentle depth, motion, and tactile scenes only when it improves baby-safe interaction. Keep 3D animations simple, performant, and non-essential to understanding the activity.
 
 ---
 
@@ -847,6 +874,13 @@ eas submit --platform android
 - Sound + haptic feedback on all activities
 - Parent voice recording for Peekaboo
 - Local persistence (no accounts)
+
+### Phase 1.2 — GitHub Pages Web/PWA Deployment
+- Prepare the Expo static web build for GitHub Pages deployment after the Phase 1 app foundation is complete
+- Keep native mobile as the primary target while enabling browser demos and testing through Expo Web
+- Add the `export:web` script and GitHub Actions Pages workflow for the generated `dist/` output
+- Run tests and typecheck before deploying the static site
+- Preserve Phase 1 local-only and offline-first behavior where browser APIs allow it
 
 ### Phase 2 — Cloud & Accounts (weeks 9–16)
 - Family accounts (multiple babies per parent)

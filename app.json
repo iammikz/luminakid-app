@@ -16,6 +16,12 @@
     "android": {
       "package": "com.luminakid.app"
     },
-    "plugins": ["expo-router"]
+    "web": {
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset"
+    ]
   }
 }
