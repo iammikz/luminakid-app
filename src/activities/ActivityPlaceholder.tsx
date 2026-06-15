@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { COLORS, TYPOGRAPHY } from "../constants/theme";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme";
 import type { ActivityProps } from "../types/activity";
 
 interface PlaceholderProps extends ActivityProps {
@@ -27,10 +27,11 @@ const styles = StyleSheet.create({
     minHeight: 360,
     alignItems: "center",
     justifyContent: "center",
-    gap: 16,
-    borderRadius: 8,
+    gap: SPACING.md,
+    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.primaryLight,
-    padding: 24
+    padding: SPACING.lg,
+    ...SHADOWS.card
   },
   pressed: {
     transform: [{ scale: 0.98 }]
@@ -41,7 +42,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 70,
-    backgroundColor: COLORS.background
+    backgroundColor: COLORS.background,
+    ...SHADOWS.warm
   },
   emoji: {
     fontSize: 64

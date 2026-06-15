@@ -7,7 +7,7 @@ import Animated, {
   withTiming
 } from "react-native-reanimated";
 
-import { COLORS } from "../constants/theme";
+import { COLORS, RADIUS, SHADOWS } from "../constants/theme";
 import type { ActivityProps } from "../types/activity";
 import type { Animal } from "./activityHelpers";
 import { getRandomAnimal } from "./activityHelpers";
@@ -71,8 +71,9 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 8,
-    backgroundColor: "#F8ECFF"
+    borderRadius: RADIUS.xl,
+    backgroundColor: COLORS.lavender,
+    ...SHADOWS.card
   },
   reveal: {
     width: 180,
@@ -80,7 +81,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 90,
-    backgroundColor: COLORS.background
+    backgroundColor: COLORS.background,
+    ...SHADOWS.warm
   },
   revealEmoji: {
     fontSize: 92

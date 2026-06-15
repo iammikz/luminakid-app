@@ -3,7 +3,7 @@ import type { GestureResponderEvent } from "react-native";
 import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-import { COLORS } from "../constants/theme";
+import { COLORS, RADIUS, SHADOWS, TOUCH_TARGET } from "../constants/theme";
 import type { ActivityProps } from "../types/activity";
 import { getRandomPastel } from "./activityHelpers";
 
@@ -94,17 +94,22 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 8
+    borderRadius: RADIUS.xl,
+    ...SHADOWS.warm
   },
   centerGlow: {
-    fontSize: 76,
-    opacity: 0.72
+    minWidth: TOUCH_TARGET.baby,
+    minHeight: TOUCH_TARGET.baby,
+    color: COLORS.primaryDark,
+    fontSize: 86,
+    opacity: 0.86,
+    textAlign: "center"
   },
   sparkle: {
     position: "absolute",
     width: 36,
     height: 36,
-    color: COLORS.primaryDark,
+    color: COLORS.primary,
     fontSize: 34,
     textAlign: "center",
     textAlignVertical: "center"

@@ -1,10 +1,13 @@
 import { Link } from "expo-router";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { AppScreen } from "../../src/components/AppScreen";
+import { DepthBackdrop } from "../../src/components/DepthBackdrop";
+import { ElevatedSurface } from "../../src/components/ElevatedSurface";
 import { LockOverlay } from "../../src/components/LockOverlay";
 import { MonthNav } from "../../src/components/MonthNav";
 import { SkillTags } from "../../src/components/SkillTags";
-import { COLORS, TYPOGRAPHY } from "../../src/constants/theme";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../../src/constants/theme";
 import { getActiveActivity } from "../../src/engine/ageEngine";
 import { ACTIVITY_REGISTRY } from "../../src/engine/activityRegistry";
 import { useBabyAge } from "../../src/hooks/useBabyAge";
@@ -18,14 +21,14 @@ export default function PlayScreen() {
 
   if (!baby) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.empty}>
+      <AppScreen>
+        <ElevatedSurface style={styles.empty}>
           <Text style={styles.title}>LuminaKid</Text>
           <Link href="/setup" style={styles.link}>
             Set up baby profile
           </Link>
-        </View>
-      </SafeAreaView>
+        </ElevatedSurface>
+      </AppScreen>
     );
   }
 
@@ -36,13 +39,14 @@ export default function PlayScreen() {
   const locked = babyAgeMonths < activity.minMonths;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <AppScreen centered={false} style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
+        <ElevatedSurface tone="lavender" style={styles.header}>
+          <DepthBackdrop />
           <Text style={styles.eyebrow}>{baby.name}</Text>
           <Text style={styles.title}>{activity.title}</Text>
           <Text style={styles.copy}>{activity.goal}</Text>
-        </View>
+        </ElevatedSurface>
 
         <MonthNav
           activities={ACTIVITY_REGISTRY}
@@ -57,44 +61,45 @@ export default function PlayScreen() {
 
         <SkillTags skills={activity.skills} />
       </ScrollView>
-    </SafeAreaView>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: COLORS.surface
+  screen: {
+    paddingHorizontal: 0
   },
   content: {
-    gap: 20,
-    paddingVertical: 24
+    gap: SPACING.lg,
+    paddingVertical: SPACING.lg
   },
   header: {
-    gap: 8,
-    paddingHorizontal: 20
+    overflow: "hidden",
+    marginHorizontal: SPACING.mobileMargin,
+    gap: SPACING.sm,
+    minHeight: 180
   },
   eyebrow: {
-    ...TYPOGRAPHY.small,
+    ...TYPOGRAPHY.label,
     color: COLORS.primary
   },
   title: {
-    ...TYPOGRAPHY.h1,
-    color: COLORS.textPrimary
+    ...TYPOGRAPHY.display,
+    color: COLORS.primaryDark
   },
   copy: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary
   },
   activitySlot: {
-    paddingHorizontal: 20
+    marginHorizontal: SPACING.mobileMargin,
+    borderRadius: RADIUS.xl,
+    ...SHADOWS.card
   },
   empty: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 18,
-    padding: 24
+    gap: SPACING.lg
   },
   link: {
     ...TYPOGRAPHY.h3,

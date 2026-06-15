@@ -1,33 +1,30 @@
 import { StyleSheet, Text, View } from "react-native";
 import type React from "react";
 
-import { COLORS, TYPOGRAPHY } from "../constants/theme";
+import { COLORS, SPACING, TYPOGRAPHY } from "../constants/theme";
+import { ElevatedSurface } from "./ElevatedSurface";
 
 interface JournalCardProps {
   title: string;
   children: React.ReactNode;
+  tone?: "white" | "lavender" | "mint" | "peach" | "yellow";
 }
 
-export function JournalCard({ title, children }: JournalCardProps) {
+export function JournalCard({ title, children, tone = "white" }: JournalCardProps) {
   return (
-    <View style={styles.card}>
+    <ElevatedSurface tone={tone} style={styles.card}>
       <Text style={styles.title}>{title}</Text>
       <View>{children}</View>
-    </View>
+    </ElevatedSurface>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    gap: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
-    padding: 18
+    gap: SPACING.md
   },
   title: {
-    ...TYPOGRAPHY.h3,
-    color: COLORS.textPrimary
+    ...TYPOGRAPHY.h2,
+    color: COLORS.primaryDark
   }
 });

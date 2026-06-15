@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { COLORS, TYPOGRAPHY } from "../constants/theme";
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme";
 
 interface SkillTagsProps {
   skills: string[];
@@ -22,14 +22,15 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8
+    gap: SPACING.sm,
+    paddingHorizontal: SPACING.mobileMargin
   },
   tag: {
-    minHeight: 36,
+    minHeight: 40,
     justifyContent: "center",
-    borderRadius: 18,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: 14
+    paddingHorizontal: SPACING.md
   },
   text: {
     ...TYPOGRAPHY.small,

@@ -3,7 +3,7 @@ import type { LayoutChangeEvent } from "react-native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-import { COLORS } from "../constants/theme";
+import { COLORS, RADIUS, SHADOWS } from "../constants/theme";
 import type { ActivityProps } from "../types/activity";
 import type { BubbleModel, CanvasSize } from "./activityHelpers";
 import { createBubble } from "./activityHelpers";
@@ -113,13 +113,19 @@ const styles = StyleSheet.create({
   canvas: {
     minHeight: 380,
     overflow: "hidden",
-    borderRadius: 8,
-    backgroundColor: "#EAF8FF"
+    borderRadius: RADIUS.xl,
+    backgroundColor: "#DFF6FF",
+    ...SHADOWS.card
   },
   bubble: {
     position: "absolute",
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.82)"
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.9)",
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4
   },
   bubblePressable: {
     minWidth: 88,
@@ -130,7 +136,7 @@ const styles = StyleSheet.create({
   },
   bubbleShine: {
     color: COLORS.background,
-    fontSize: 42,
-    opacity: 0.86
+    fontSize: 48,
+    opacity: 0.92
   }
 });

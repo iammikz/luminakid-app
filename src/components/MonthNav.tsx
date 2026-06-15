@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 
-import { COLORS, TYPOGRAPHY } from "../constants/theme";
+import { COLORS, RADIUS, SHADOWS, SPACING, TOUCH_TARGET, TYPOGRAPHY } from "../constants/theme";
 import type { Activity } from "../types/activity";
 
 interface MonthNavProps {
@@ -22,7 +22,7 @@ export function MonthNav({ activities, babyAgeMonths, selectedMonth, onSelectMon
             accessibilityRole="button"
             disabled={locked}
             onPress={() => onSelectMonth(activity.minMonths)}
-            style={[styles.item, selected && styles.selected, locked && styles.locked]}
+            style={({ pressed }) => [styles.item, selected && styles.selected, locked && styles.locked, pressed && styles.pressed]}
           >
             <Text style={styles.emoji}>{activity.emoji}</Text>
             <Text style={[styles.label, selected && styles.selectedLabel]}>{activity.minMonths}m</Text>
@@ -35,31 +35,36 @@ export function MonthNav({ activities, babyAgeMonths, selectedMonth, onSelectMon
 
 const styles = StyleSheet.create({
   content: {
-    gap: 10,
-    paddingHorizontal: 20
+    gap: SPACING.md,
+    paddingHorizontal: SPACING.mobileMargin,
+    paddingVertical: SPACING.sm
   },
   item: {
-    width: 88,
-    height: 88,
+    width: TOUCH_TARGET.baby,
+    height: TOUCH_TARGET.baby,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surface,
+    ...SHADOWS.card
   },
   selected: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primaryStrong,
+    shadowOpacity: 0.24
   },
   locked: {
-    opacity: 0.4
+    opacity: 0.42,
+    backgroundColor: COLORS.surfaceSoft
+  },
+  pressed: {
+    transform: [{ translateY: 3 }, { scale: 0.97 }]
   },
   emoji: {
-    fontSize: 28
+    fontSize: 30
   },
   label: {
-    ...TYPOGRAPHY.small,
+    ...TYPOGRAPHY.label,
     color: COLORS.textSecondary
   },
   selectedLabel: {
