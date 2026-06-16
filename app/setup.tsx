@@ -1,9 +1,13 @@
 import { differenceInMonths, isFuture, isValid, parseISO } from "date-fns";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { COLORS, TYPOGRAPHY } from "../src/constants/theme";
+import { AppScreen } from "../src/components/AppScreen";
+import { DepthBackdrop } from "../src/components/DepthBackdrop";
+import { ElevatedSurface } from "../src/components/ElevatedSurface";
+import { TactileButton } from "../src/components/TactileButton";
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../src/constants/theme";
 import { useBabyStore } from "../src/store/useBabyStore";
 import type { BabyProfile } from "../src/types/baby";
 
@@ -50,8 +54,9 @@ export default function SetupScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
+    <AppScreen>
+      <ElevatedSurface style={styles.card}>
+        <DepthBackdrop />
         <Text style={styles.brand}>LuminaKid</Text>
         <Text style={styles.title}>Set up your baby's first activity path</Text>
         <Text style={styles.copy}>
@@ -82,65 +87,51 @@ export default function SetupScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Pressable accessibilityRole="button" onPress={save} style={styles.button}>
-          <Text style={styles.buttonText}>Continue</Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        <TactileButton onPress={save}>Continue</TactileButton>
+      </ElevatedSurface>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: COLORS.background
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    gap: 18,
-    padding: 24
+  card: {
+    overflow: "hidden",
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
+    gap: SPACING.md,
+    padding: SPACING.xl
   },
   brand: {
-    ...TYPOGRAPHY.h3,
+    ...TYPOGRAPHY.label,
     color: COLORS.primary
   },
   title: {
-    ...TYPOGRAPHY.h1,
-    color: COLORS.textPrimary
+    ...TYPOGRAPHY.display,
+    color: COLORS.primaryDark
   },
   copy: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary
   },
   field: {
-    gap: 8
+    gap: SPACING.sm
   },
   label: {
-    ...TYPOGRAPHY.small,
+    ...TYPOGRAPHY.label,
     color: COLORS.textPrimary
   },
   input: {
     minHeight: 56,
-    borderRadius: 8,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
-    paddingHorizontal: 14,
+    backgroundColor: COLORS.surfaceSoft,
+    paddingHorizontal: SPACING.md,
     color: COLORS.textPrimary
   },
   error: {
     ...TYPOGRAPHY.small,
-    color: COLORS.coral
-  },
-  button: {
-    minHeight: 88,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 8,
-    backgroundColor: COLORS.primary
-  },
-  buttonText: {
-    ...TYPOGRAPHY.h3,
-    color: COLORS.background
+    color: COLORS.error
   }
 });

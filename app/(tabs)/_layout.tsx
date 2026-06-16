@@ -1,6 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
-import { COLORS } from "../../src/constants/theme";
+import { COLORS, RADIUS, SHADOWS, TYPOGRAPHY } from "../../src/constants/theme";
 
 export default function TabLayout() {
   return (
@@ -10,17 +11,38 @@ export default function TabLayout() {
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textSecondary,
         tabBarStyle: {
-          minHeight: 72,
+          minHeight: 76,
+          width: "92%",
+          maxWidth: 920,
+          alignSelf: "center",
+          marginHorizontal: 18,
+          marginBottom: 14,
+          borderTopWidth: 0,
+          borderRadius: RADIUS.xl,
+          backgroundColor: COLORS.surface,
           paddingBottom: 10,
-          paddingTop: 8
+          paddingTop: 8,
+          ...SHADOWS.card
         },
         tabBarLabelStyle: {
-          fontSize: 13
+          ...TYPOGRAPHY.small
         }
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "Play" }} />
-      <Tabs.Screen name="journal" options={{ title: "Journal" }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Play",
+          tabBarIcon: ({ color, size }) => <Ionicons name="sparkles" color={color} size={size} />
+        }}
+      />
+      <Tabs.Screen
+        name="journal"
+        options={{
+          title: "Journal",
+          tabBarIcon: ({ color, size }) => <Ionicons name="book" color={color} size={size} />
+        }}
+      />
     </Tabs>
   );
 }

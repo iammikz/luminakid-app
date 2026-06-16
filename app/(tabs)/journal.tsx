@@ -1,8 +1,10 @@
 import { Link } from "expo-router";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { AppScreen } from "../../src/components/AppScreen";
+import { ElevatedSurface } from "../../src/components/ElevatedSurface";
 import { JournalCard } from "../../src/components/JournalCard";
-import { COLORS, TYPOGRAPHY } from "../../src/constants/theme";
+import { COLORS, SPACING, TYPOGRAPHY } from "../../src/constants/theme";
 import { getActiveActivity, getSupportedJournalMonth } from "../../src/engine/ageEngine";
 import { ACTIVITY_REGISTRY } from "../../src/engine/activityRegistry";
 import { JOURNAL_DATA } from "../../src/engine/journalData";
@@ -16,14 +18,14 @@ export default function JournalScreen() {
 
   if (!baby) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.empty}>
+      <AppScreen>
+        <ElevatedSurface style={styles.empty}>
           <Text style={styles.title}>Journal</Text>
           <Link href="/setup" style={styles.link}>
             Set up baby profile
           </Link>
-        </View>
-      </SafeAreaView>
+        </ElevatedSurface>
+      </AppScreen>
     );
   }
 
@@ -32,20 +34,20 @@ export default function JournalScreen() {
   const journal = JOURNAL_DATA[journalMonth];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <AppScreen centered={false} style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
+        <ElevatedSurface tone="peach" style={styles.header}>
           <Text style={styles.eyebrow}>{baby.name}</Text>
           <Text style={styles.title}>{journal.monthLabel}</Text>
           <Text style={styles.copy}>Development notes and real-world play ideas for this stage.</Text>
-        </View>
+        </ElevatedSurface>
 
-        <JournalCard title="Development Focus">
+        <JournalCard title="Development Focus" tone="white">
           <Text style={styles.body}>{journal.developmentFocus}</Text>
           <Text style={styles.tip}>{journal.parentTip}</Text>
         </JournalCard>
 
-        <JournalCard title="Milestones This Month">
+        <JournalCard title="Milestones This Month" tone="lavender">
           <View style={styles.list}>
             {journal.milestones.map((milestone) => (
               <Text key={milestone} style={styles.body}>
@@ -55,33 +57,32 @@ export default function JournalScreen() {
           </View>
         </JournalCard>
 
-        <JournalCard title="Parent Activity Idea">
+        <JournalCard title="Parent Activity Idea" tone="mint">
           <Text style={styles.body}>{journal.parentActivity}</Text>
         </JournalCard>
       </ScrollView>
-    </SafeAreaView>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: COLORS.surface
+  screen: {
+    paddingHorizontal: 0
   },
   content: {
-    gap: 16,
-    padding: 20
+    gap: SPACING.lg,
+    padding: SPACING.mobileMargin
   },
   header: {
-    gap: 8
+    gap: SPACING.sm
   },
   eyebrow: {
-    ...TYPOGRAPHY.small,
+    ...TYPOGRAPHY.label,
     color: COLORS.primary
   },
   title: {
-    ...TYPOGRAPHY.h1,
-    color: COLORS.textPrimary
+    ...TYPOGRAPHY.display,
+    color: COLORS.primaryDark
   },
   copy: {
     ...TYPOGRAPHY.body,
@@ -97,14 +98,12 @@ const styles = StyleSheet.create({
     color: COLORS.primaryDark
   },
   list: {
-    gap: 8
+    gap: SPACING.sm
   },
   empty: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 18,
-    padding: 24
+    gap: SPACING.lg
   },
   link: {
     ...TYPOGRAPHY.h3,

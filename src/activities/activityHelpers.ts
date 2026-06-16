@@ -29,8 +29,8 @@ export const ANIMALS: Animal[] = [
   { id: "horse", emoji: "🐴", label: "Horse", soundLabel: "Neigh! Horse!" }
 ];
 
-const BUBBLE_COLORS = ["#B7F0FF", "#FFD5E7", "#DCD7FF", "#CFF7DF", "#FFE4AD"];
-const PASTELS = ["#EEEDFE", "#E8F8F1", "#FFF1D6", "#FCE4EC", "#E2F6FF", "#F7ECFF"];
+const BUBBLE_COLORS = ["#2E5BFF", "#FFD23F", "#FF9F89", "#B8C3FF", "#DDF7ED"];
+const PASTELS = ["#EEF1FF", "#DDF7ED", "#FFEFB0", "#FFE1DA", "#DFF6FF", "#EEE9FF"];
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);

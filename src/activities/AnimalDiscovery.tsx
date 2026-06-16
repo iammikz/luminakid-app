@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { COLORS, TYPOGRAPHY } from "../constants/theme";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme";
 import type { ActivityProps } from "../types/activity";
 import type { Animal } from "./activityHelpers";
 import { selectUniqueAnimals } from "./activityHelpers";
@@ -60,9 +60,10 @@ const styles = StyleSheet.create({
   canvas: {
     minHeight: 380,
     justifyContent: "flex-end",
-    borderRadius: 8,
-    backgroundColor: "#FFF6E8",
-    padding: 16
+    borderRadius: RADIUS.xl,
+    backgroundColor: COLORS.secondarySoft,
+    padding: SPACING.md,
+    ...SHADOWS.warm
   },
   speechBubble: {
     position: "absolute",
@@ -71,10 +72,11 @@ const styles = StyleSheet.create({
     left: 18,
     zIndex: 1,
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: RADIUS.lg,
     backgroundColor: COLORS.background,
     paddingHorizontal: 18,
-    paddingVertical: 12
+    paddingVertical: 12,
+    ...SHADOWS.card
   },
   speechText: {
     ...TYPOGRAPHY.h3,
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12
+    gap: SPACING.md
   },
   card: {
     minWidth: 120,
@@ -93,15 +95,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    gap: SPACING.sm,
+    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.background,
-    padding: 12
+    padding: SPACING.md,
+    ...SHADOWS.card
   },
   cardPressed: {
-    transform: [{ scale: 0.96 }],
+    transform: [{ translateY: 4 }, { scale: 0.97 }],
     backgroundColor: COLORS.primaryLight
   },
   emoji: {
