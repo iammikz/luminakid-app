@@ -4,6 +4,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { COLORS, RADIUS, SHADOWS } from "../constants/theme";
+import { useHaptics } from "../hooks/useHaptics";
+import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
 import type { BubbleModel, CanvasSize } from "./activityHelpers";
 import { createBubble } from "./activityHelpers";
@@ -52,6 +54,8 @@ export function BubblePop(_props: ActivityProps) {
   const [canvas, setCanvas] = useState<CanvasSize>({ width: 0, height: 0 });
   const [bubbles, setBubbles] = useState<BubbleState[]>([]);
   const popTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const { light } = useHaptics();
+  const popSound = useSound("pop");
 
   useEffect(
     () => () => {
@@ -93,12 +97,14 @@ export function BubblePop(_props: ActivityProps) {
   }, []);
 
   const popBubble = useCallback((id: string) => {
+    light();
+    void popSound.play();
     setBubbles((current) => current.map((bubble) => (bubble.id === id ? { ...bubble, popping: true } : bubble)));
     const popTimer = setTimeout(() => {
       setBubbles((current) => current.filter((bubble) => bubble.id !== id));
     }, 320);
     popTimers.current.push(popTimer);
-  }, []);
+  }, [light, popSound]);
 
   return (
     <View style={styles.canvas} onLayout={handleLayout}>

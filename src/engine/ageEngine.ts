@@ -5,7 +5,8 @@ import type { Activity } from "../types/activity";
 const JOURNAL_MONTHS = [6, 7, 8, 9, 10, 11, 12, 13, 16, 19] as const;
 
 export function getBabyAgeMonths(dateOfBirth: string, now = new Date()): number {
-  return Math.max(0, differenceInMonths(now, new Date(dateOfBirth)));
+  const ageMonths = differenceInMonths(now, new Date(dateOfBirth));
+  return Number.isFinite(ageMonths) ? Math.max(0, ageMonths) : 0;
 }
 
 export function isActivityUnlocked(activity: Activity, ageMonths: number): boolean {

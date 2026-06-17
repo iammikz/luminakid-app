@@ -5,7 +5,8 @@ import { AppScreen } from "../../src/components/AppScreen";
 import { ElevatedSurface } from "../../src/components/ElevatedSurface";
 import { JournalCard } from "../../src/components/JournalCard";
 import { COLORS, SPACING, TYPOGRAPHY } from "../../src/constants/theme";
-import { getActiveActivity, getSupportedJournalMonth } from "../../src/engine/ageEngine";
+import { getSupportedJournalMonth } from "../../src/engine/ageEngine";
+import { getSelectableActivity } from "../../src/engine/activitySelection";
 import { ACTIVITY_REGISTRY } from "../../src/engine/activityRegistry";
 import { JOURNAL_DATA } from "../../src/engine/journalData";
 import { useBabyAge } from "../../src/hooks/useBabyAge";
@@ -29,8 +30,8 @@ export default function JournalScreen() {
     );
   }
 
-  const autoActivity = getActiveActivity(babyAgeMonths, ACTIVITY_REGISTRY);
-  const journalMonth = getSupportedJournalMonth(selectedMonth ?? autoActivity.minMonths);
+  const activity = getSelectableActivity(selectedMonth, babyAgeMonths, ACTIVITY_REGISTRY);
+  const journalMonth = getSupportedJournalMonth(activity.minMonths);
   const journal = JOURNAL_DATA[journalMonth];
 
   return (

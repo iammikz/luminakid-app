@@ -18,6 +18,11 @@ export interface BubbleModel {
   color: string;
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export const ANIMALS: Animal[] = [
   { id: "cow", emoji: "🐄", label: "Cow", soundLabel: "Moo! Cow!" },
   { id: "dog", emoji: "🐶", label: "Dog", soundLabel: "Woof! Dog!" },
@@ -75,4 +80,22 @@ export function createBubble(canvas: CanvasSize, random = Math.random): BubbleMo
     y: Math.round(random() * maxY),
     color: BUBBLE_COLORS[pickIndex(BUBBLE_COLORS.length, random)]
   };
+}
+
+export function getRandomFireflyTarget(canvas: CanvasSize, targetSize: number, random = Math.random): Point {
+  const maxX = Math.max(0, canvas.width - targetSize);
+  const maxY = Math.max(0, canvas.height - targetSize);
+
+  return {
+    x: Math.round(random() * maxX),
+    y: Math.round(random() * maxY)
+  };
+}
+
+export function getNextFireflyDelay(random = Math.random): number {
+  return Math.floor(1500 + random() * 1000);
+}
+
+export function areAllFlowersBloomed(flowers: boolean[]): boolean {
+  return flowers.length > 0 && flowers.every(Boolean);
 }

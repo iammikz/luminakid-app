@@ -8,7 +8,7 @@ interface LockOverlayProps {
 
 export function LockOverlay({ unlockMonth }: LockOverlayProps) {
   return (
-    <View style={styles.overlay}>
+    <View accessibilityLabel={`Activity unlocks at ${unlockMonth} months`} style={styles.overlay}>
       <View style={styles.iconBubble}>
         <Text style={styles.icon}>🔒</Text>
       </View>

@@ -19,7 +19,9 @@ export function MonthNav({ activities, babyAgeMonths, selectedMonth, onSelectMon
         return (
           <Pressable
             key={activity.id}
+            accessibilityLabel={`${activity.title}, ${locked ? "locked" : "unlocked"}, ${activity.minMonths} months`}
             accessibilityRole="button"
+            accessibilityState={{ disabled: locked, selected }}
             disabled={locked}
             onPress={() => onSelectMonth(activity.minMonths)}
             style={({ pressed }) => [styles.item, selected && styles.selected, locked && styles.locked, pressed && styles.pressed]}

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme";
+import { useHaptics } from "../hooks/useHaptics";
+import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
 import type { Animal } from "./activityHelpers";
 import { selectUniqueAnimals } from "./activityHelpers";
@@ -10,6 +12,15 @@ export function AnimalDiscovery(_props: ActivityProps) {
   const animals = useMemo(() => selectUniqueAnimals(4), []);
   const [activeAnimal, setActiveAnimal] = useState<Animal | null>(null);
   const speechTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { light } = useHaptics();
+  const cowSound = useSound("cow");
+  const dogSound = useSound("dog");
+  const catSound = useSound("cat");
+  const pigSound = useSound("pig");
+  const duckSound = useSound("duck");
+  const frogSound = useSound("frog");
+  const sheepSound = useSound("sheep");
+  const horseSound = useSound("horse");
 
   useEffect(
     () => () => {
@@ -25,6 +36,18 @@ export function AnimalDiscovery(_props: ActivityProps) {
       clearTimeout(speechTimer.current);
     }
 
+    light();
+    const sounds = {
+      cow: cowSound,
+      dog: dogSound,
+      cat: catSound,
+      pig: pigSound,
+      duck: duckSound,
+      frog: frogSound,
+      sheep: sheepSound,
+      horse: horseSound
+    };
+    void sounds[animal.id as keyof typeof sounds]?.play();
     setActiveAnimal(animal);
     speechTimer.current = setTimeout(() => {
       setActiveAnimal((current) => (current?.id === animal.id ? null : current));

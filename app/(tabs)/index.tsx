@@ -8,7 +8,7 @@ import { LockOverlay } from "../../src/components/LockOverlay";
 import { MonthNav } from "../../src/components/MonthNav";
 import { SkillTags } from "../../src/components/SkillTags";
 import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../../src/constants/theme";
-import { getActiveActivity } from "../../src/engine/ageEngine";
+import { getSelectableActivity } from "../../src/engine/activitySelection";
 import { ACTIVITY_REGISTRY } from "../../src/engine/activityRegistry";
 import { useBabyAge } from "../../src/hooks/useBabyAge";
 import { useBabyStore } from "../../src/store/useBabyStore";
@@ -32,9 +32,7 @@ export default function PlayScreen() {
     );
   }
 
-  const autoActivity = getActiveActivity(babyAgeMonths, ACTIVITY_REGISTRY);
-  const activeMonth = selectedMonth ?? autoActivity.minMonths;
-  const activity = ACTIVITY_REGISTRY.find((item) => item.minMonths === activeMonth) ?? autoActivity;
+  const activity = getSelectableActivity(selectedMonth, babyAgeMonths, ACTIVITY_REGISTRY);
   const ActivityComponent = activity.component;
   const locked = babyAgeMonths < activity.minMonths;
 

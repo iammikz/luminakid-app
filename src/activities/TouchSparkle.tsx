@@ -4,6 +4,8 @@ import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { COLORS, RADIUS, SHADOWS, TOUCH_TARGET } from "../constants/theme";
+import { useHaptics } from "../hooks/useHaptics";
+import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
 import { getRandomPastel } from "./activityHelpers";
 
@@ -51,6 +53,8 @@ export function TouchSparkle(_props: ActivityProps) {
   const [backgroundColor, setBackgroundColor] = useState<string>(COLORS.primaryLight);
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
   const cleanupTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const { light } = useHaptics();
+  const chime = useSound("chime");
 
   useEffect(
     () => () => {
@@ -59,24 +63,29 @@ export function TouchSparkle(_props: ActivityProps) {
     []
   );
 
-  const addSparkles = useCallback((event: GestureResponderEvent) => {
-    const { locationX, locationY } = event.nativeEvent;
-    const createdAt = Date.now();
-    const nextSparkles = Array.from({ length: 5 }, (_, index) => ({
-      id: `${createdAt}-${index}`,
-      x: locationX,
-      y: locationY,
-      angle: (Math.PI * 2 * index) / 5 + Math.random() * 0.45,
-      distance: 52 + Math.random() * 56
-    }));
+  const addSparkles = useCallback(
+    (event: GestureResponderEvent) => {
+      const { locationX, locationY } = event.nativeEvent;
+      const createdAt = Date.now();
+      const nextSparkles = Array.from({ length: 5 }, (_, index) => ({
+        id: `${createdAt}-${index}`,
+        x: locationX,
+        y: locationY,
+        angle: (Math.PI * 2 * index) / 5 + Math.random() * 0.45,
+        distance: 52 + Math.random() * 56
+      }));
 
-    setBackgroundColor(getRandomPastel());
-    setSparkles((current) => [...current, ...nextSparkles]);
-    const cleanupTimer = setTimeout(() => {
-      setSparkles((current) => current.filter((sparkle) => !nextSparkles.some((item) => item.id === sparkle.id)));
-    }, 850);
-    cleanupTimers.current.push(cleanupTimer);
-  }, []);
+      light();
+      void chime.play();
+      setBackgroundColor(getRandomPastel());
+      setSparkles((current) => [...current, ...nextSparkles]);
+      const cleanupTimer = setTimeout(() => {
+        setSparkles((current) => current.filter((sparkle) => !nextSparkles.some((item) => item.id === sparkle.id)));
+      }, 850);
+      cleanupTimers.current.push(cleanupTimer);
+    },
+    [chime, light]
+  );
 
   return (
     <Pressable style={[styles.canvas, { backgroundColor }]} onPress={addSparkles}>

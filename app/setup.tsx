@@ -1,4 +1,3 @@
-import { differenceInMonths, isFuture, isValid, parseISO } from "date-fns";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
@@ -8,32 +7,8 @@ import { DepthBackdrop } from "../src/components/DepthBackdrop";
 import { ElevatedSurface } from "../src/components/ElevatedSurface";
 import { TactileButton } from "../src/components/TactileButton";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../src/constants/theme";
+import { createBabyProfile, getMonthsUntilFirstActivity, validateDateOfBirth } from "../src/engine/onboarding";
 import { useBabyStore } from "../src/store/useBabyStore";
-import type { BabyProfile } from "../src/types/baby";
-
-function createProfile(name: string, dateOfBirth: string): BabyProfile {
-  const now = new Date().toISOString();
-  return {
-    id: `${Date.now()}`,
-    name: name.trim() || "Your baby",
-    dateOfBirth,
-    createdAt: now
-  };
-}
-
-function validateDob(value: string): string | null {
-  const parsed = parseISO(value);
-  if (!isValid(parsed)) {
-    return "Enter a valid date as YYYY-MM-DD.";
-  }
-  if (isFuture(parsed)) {
-    return "Date of birth must be in the past.";
-  }
-  if (differenceInMonths(new Date(), parsed) > 24) {
-    return "LuminaKid currently supports babies up to 24 months.";
-  }
-  return null;
-}
 
 export default function SetupScreen() {
   const router = useRouter();
@@ -41,17 +16,43 @@ export default function SetupScreen() {
   const [name, setName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [monthsUntilFirstActivity, setMonthsUntilFirstActivity] = useState<number | null>(null);
 
   const save = () => {
-    const validationError = validateDob(dateOfBirth);
+    const validationError = validateDateOfBirth(dateOfBirth);
     if (validationError) {
       setError(validationError);
       return;
     }
     setError(null);
-    setBaby(createProfile(name, dateOfBirth));
+    setBaby(createBabyProfile(name, dateOfBirth));
+    const monthsUntilUnlock = getMonthsUntilFirstActivity(dateOfBirth);
+    if (monthsUntilUnlock > 0) {
+      setMonthsUntilFirstActivity(monthsUntilUnlock);
+      return;
+    }
     router.replace("/(tabs)");
   };
+
+  if (monthsUntilFirstActivity !== null) {
+    return (
+      <AppScreen>
+        <ElevatedSurface style={styles.card}>
+          <DepthBackdrop />
+          <Text style={styles.brand}>LuminaKid</Text>
+          <Text style={styles.title}>First activity coming soon</Text>
+          <Text style={styles.copy}>
+            Touch & Sparkle opens at 6 months. That is about {monthsUntilFirstActivity}{" "}
+            {monthsUntilFirstActivity === 1 ? "month" : "months"} away.
+          </Text>
+          <Text style={styles.copy}>The journal is ready now with gentle real-world play ideas.</Text>
+          <TactileButton accessibilityLabel="Open LuminaKid" onPress={() => router.replace("/(tabs)")}>
+            Open LuminaKid
+          </TactileButton>
+        </ElevatedSurface>
+      </AppScreen>
+    );
+  }
 
   return (
     <AppScreen>
@@ -66,6 +67,7 @@ export default function SetupScreen() {
         <View style={styles.field}>
           <Text style={styles.label}>Baby name</Text>
           <TextInput
+            accessibilityLabel="Baby name"
             value={name}
             onChangeText={setName}
             placeholder="Your baby"
@@ -77,6 +79,7 @@ export default function SetupScreen() {
         <View style={styles.field}>
           <Text style={styles.label}>Date of birth</Text>
           <TextInput
+            accessibilityLabel="Date of birth"
             value={dateOfBirth}
             onChangeText={setDateOfBirth}
             placeholder="YYYY-MM-DD"
@@ -87,7 +90,7 @@ export default function SetupScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TactileButton onPress={save}>Continue</TactileButton>
+        <TactileButton accessibilityLabel="Continue setup" onPress={save}>Continue</TactileButton>
       </ElevatedSurface>
     </AppScreen>
   );

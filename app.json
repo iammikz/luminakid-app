@@ -11,17 +11,23 @@
       "resizeMode": "contain"
     },
     "ios": {
-      "bundleIdentifier": "com.luminakid.app"
+      "bundleIdentifier": "com.luminakid.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Used to record your voice for the Peekaboo activity."
+      }
     },
     "android": {
-      "package": "com.luminakid.app"
+      "package": "com.luminakid.app",
+      "permissions": ["RECORD_AUDIO"]
     },
     "web": {
       "output": "static"
     },
     "plugins": [
       "expo-router",
-      "expo-asset"
+      "expo-asset",
+      "expo-font",
+      "expo-av"
     ]
   }
 }

@@ -11,7 +11,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textSecondary,
         tabBarStyle: {
-          minHeight: 76,
+          minHeight: 88,
           width: "92%",
           maxWidth: 920,
           alignSelf: "center",
@@ -41,6 +41,13 @@ export default function TabLayout() {
         options={{
           title: "Journal",
           tabBarIcon: ({ color, size }) => <Ionicons name="book" color={color} size={size} />
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, size }) => <Ionicons name="settings" color={color} size={size} />
         }}
       />
     </Tabs>

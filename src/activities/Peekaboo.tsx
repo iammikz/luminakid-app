@@ -8,6 +8,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { COLORS, RADIUS, SHADOWS } from "../constants/theme";
+import { useHaptics } from "../hooks/useHaptics";
+import { playUri, useSound } from "../hooks/useSound";
+import { useBabyStore } from "../store/useBabyStore";
 import type { ActivityProps } from "../types/activity";
 import type { Animal } from "./activityHelpers";
 import { getRandomAnimal } from "./activityHelpers";
@@ -17,6 +20,9 @@ export function Peekaboo(_props: ActivityProps) {
   const [isOpen, setIsOpen] = useState(false);
   const openProgress = useSharedValue(0);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const peekabooVoiceUri = useBabyStore((state) => state.peekabooVoiceUri);
+  const { light } = useHaptics();
+  const chime = useSound("chime");
 
   useEffect(
     () => () => {
@@ -46,12 +52,18 @@ export function Peekaboo(_props: ActivityProps) {
 
     setAnimal(getRandomAnimal());
     setIsOpen(true);
+    light();
+    if (peekabooVoiceUri) {
+      void playUri(peekabooVoiceUri);
+    } else {
+      void chime.play();
+    }
     openProgress.value = withTiming(1, { duration: 600 });
     closeTimer.current = setTimeout(() => {
       openProgress.value = withTiming(0, { duration: 600 });
       setIsOpen(false);
     }, 2000);
-  }, [isOpen, openProgress]);
+  }, [chime, isOpen, light, openProgress, peekabooVoiceUri]);
 
   return (
     <Pressable style={styles.canvas} onPress={reveal}>

@@ -21,6 +21,10 @@ describe("age engine", () => {
     expect(getBabyAgeMonths("2025-12-16", new Date("2026-06-15T12:00:00Z"))).toBe(5);
   });
 
+  it("treats malformed persisted birth dates as age zero", () => {
+    expect(getBabyAgeMonths("not-a-date", new Date("2026-06-15T12:00:00Z"))).toBe(0);
+  });
+
   it("does not unlock activities before their minimum month", () => {
     expect(isActivityUnlocked(activities[0], 5)).toBe(false);
     expect(isActivityUnlocked(activities[0], 6)).toBe(true);
@@ -28,6 +32,11 @@ describe("age engine", () => {
 
   it("selects the latest eligible activity for the baby age", () => {
     expect(getActiveActivity(5, activities).id).toBe("touch-sparkle");
+    expect(getActiveActivity(6, activities).id).toBe("touch-sparkle");
+    expect(getActiveActivity(12, activities).id).toBe("bubble-pop");
+    expect(getActiveActivity(15, activities).id).toBe("matching-game");
+    expect(getActiveActivity(18, activities).id).toBe("matching-game");
+    expect(getActiveActivity(24, activities).id).toBe("mini-puzzles");
     expect(getActiveActivity(7, activities).id).toBe("bubble-pop");
     expect(getActiveActivity(16, activities).id).toBe("matching-game");
     expect(getActiveActivity(25, activities).id).toBe("mini-puzzles");
