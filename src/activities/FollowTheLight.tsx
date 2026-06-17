@@ -154,9 +154,9 @@ export function FollowTheLight(_props: ActivityProps) {
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 380,
     overflow: "hidden",
-    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.primaryDark,
     ...SHADOWS.warm
   },

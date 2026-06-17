@@ -20,11 +20,11 @@ export function LockOverlay({ unlockMonth }: LockOverlayProps) {
 
 const styles = StyleSheet.create({
   overlay: {
+    flex: 1,
     minHeight: 320,
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.md,
-    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.secondarySoft,
     padding: SPACING.xl,
     ...SHADOWS.warm

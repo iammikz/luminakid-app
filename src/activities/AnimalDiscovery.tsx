@@ -81,9 +81,9 @@ export function AnimalDiscovery(_props: ActivityProps) {
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 380,
     justifyContent: "flex-end",
-    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.secondarySoft,
     padding: SPACING.md,
     ...SHADOWS.warm

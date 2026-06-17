@@ -1,14 +1,16 @@
+import type { StyleProp, ViewStyle } from "react-native";
 import { StyleSheet, Text, View } from "react-native";
 
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme";
 
 interface SkillTagsProps {
   skills: string[];
+  style?: StyleProp<ViewStyle>;
 }
 
-export function SkillTags({ skills }: SkillTagsProps) {
+export function SkillTags({ skills, style }: SkillTagsProps) {
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, style]}>
       {skills.map((skill) => (
         <View key={skill} style={styles.tag}>
           <Text style={styles.text}>{skill}</Text>

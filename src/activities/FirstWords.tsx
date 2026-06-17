@@ -98,9 +98,9 @@ export function FirstWords(_props: ActivityProps) {
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 380,
     justifyContent: "center",
-    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.primarySoft,
     padding: SPACING.md,
     ...SHADOWS.card

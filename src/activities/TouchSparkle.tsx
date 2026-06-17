@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GestureResponderEvent } from "react-native";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-import { COLORS, RADIUS, SHADOWS, TOUCH_TARGET } from "../constants/theme";
+import { COLORS, SHADOWS } from "../constants/theme";
 import { useHaptics } from "../hooks/useHaptics";
 import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
@@ -89,7 +89,6 @@ export function TouchSparkle(_props: ActivityProps) {
 
   return (
     <Pressable style={[styles.canvas, { backgroundColor }]} onPress={addSparkles}>
-      <Text style={styles.centerGlow}>✨</Text>
       {sparkles.map((sparkle) => (
         <SparkleParticle key={sparkle.id} sparkle={sparkle} />
       ))}
@@ -99,20 +98,12 @@ export function TouchSparkle(_props: ActivityProps) {
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 380,
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: RADIUS.xl,
     ...SHADOWS.warm
-  },
-  centerGlow: {
-    minWidth: TOUCH_TARGET.baby,
-    minHeight: TOUCH_TARGET.baby,
-    color: COLORS.primaryDark,
-    fontSize: 86,
-    opacity: 0.86,
-    textAlign: "center"
   },
   sparkle: {
     position: "absolute",

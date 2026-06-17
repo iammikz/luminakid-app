@@ -3,7 +3,7 @@ import type { LayoutChangeEvent } from "react-native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-import { COLORS, RADIUS, SHADOWS } from "../constants/theme";
+import { COLORS, SHADOWS } from "../constants/theme";
 import { useHaptics } from "../hooks/useHaptics";
 import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
@@ -117,9 +117,9 @@ export function BubblePop(_props: ActivityProps) {
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 380,
     overflow: "hidden",
-    borderRadius: RADIUS.xl,
     backgroundColor: "#DFF6FF",
     ...SHADOWS.card
   },

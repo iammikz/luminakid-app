@@ -24,11 +24,11 @@ export function ActivityPlaceholder({ babyAgeMonths, emoji, title, goal }: Place
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 360,
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.md,
-    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.primaryLight,
     padding: SPACING.lg,
     ...SHADOWS.card

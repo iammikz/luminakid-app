@@ -7,7 +7,7 @@ import Animated, {
   withTiming
 } from "react-native-reanimated";
 
-import { COLORS, RADIUS, SHADOWS } from "../constants/theme";
+import { COLORS, SHADOWS } from "../constants/theme";
 import { useHaptics } from "../hooks/useHaptics";
 import { playUri, useSound } from "../hooks/useSound";
 import { useBabyStore } from "../store/useBabyStore";
@@ -79,11 +79,11 @@ export function Peekaboo(_props: ActivityProps) {
 
 const styles = StyleSheet.create({
   canvas: {
+    flex: 1,
     minHeight: 380,
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.lavender,
     ...SHADOWS.card
   },
