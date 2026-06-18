@@ -18,6 +18,26 @@ export interface BubbleModel {
   color: string;
 }
 
+export interface BubbleHighlight {
+  width: number;
+  height: number;
+  left?: number;
+  top?: number;
+  right?: number;
+  bottom?: number;
+}
+
+export interface BubbleVisual {
+  shellColor: string;
+  rimColor: string;
+  innerGlowSize: number;
+  mainHighlight: BubbleHighlight;
+  secondaryHighlight: BubbleHighlight;
+  wobbleDistance: number;
+  wobbleDuration: number;
+  rotationDegrees: number;
+}
+
 export interface Point {
   x: number;
   y: number;
@@ -43,6 +63,28 @@ function clamp(value: number, min: number, max: number): number {
 
 function pickIndex(length: number, random: () => number): number {
   return Math.min(Math.floor(random() * length), length - 1);
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const value = hex.replace("#", "");
+  const normalized = value.length === 3 ? value.split("").map((char) => `${char}${char}`).join("") : value;
+  const parsed = Number.parseInt(normalized, 16);
+
+  return {
+    r: (parsed >> 16) & 255,
+    g: (parsed >> 8) & 255,
+    b: parsed & 255
+  };
+}
+
+function hashString(value: string): number {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+
+  return hash;
 }
 
 export function selectUniqueAnimals(count: number, random = Math.random): Animal[] {
@@ -79,6 +121,34 @@ export function createBubble(canvas: CanvasSize, random = Math.random): BubbleMo
     x: Math.round(random() * maxX),
     y: Math.round(random() * maxY),
     color: BUBBLE_COLORS[pickIndex(BUBBLE_COLORS.length, random)]
+  };
+}
+
+export function createBubbleVisual(bubble: BubbleModel): BubbleVisual {
+  const rgb = hexToRgb(bubble.color);
+  const seed = hashString(bubble.id);
+  const drift = seed % 7;
+  const rotation = (Math.floor(seed / 8) % 13) - 6;
+
+  return {
+    shellColor: `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`,
+    rimColor: "rgba(255,255,255,0.86)",
+    innerGlowSize: Math.round(bubble.size * 0.7),
+    mainHighlight: {
+      width: Math.round(bubble.size * 0.28),
+      height: Math.round(bubble.size * 0.4),
+      left: Math.round(bubble.size * 0.21),
+      top: Math.round(bubble.size * 0.15)
+    },
+    secondaryHighlight: {
+      width: Math.round(bubble.size * 0.14),
+      height: Math.round(bubble.size * 0.14),
+      right: Math.round(bubble.size * 0.22),
+      bottom: Math.round(bubble.size * 0.25)
+    },
+    wobbleDistance: 5 + drift,
+    wobbleDuration: 2400 + (seed % 1201),
+    rotationDegrees: rotation
   };
 }
 

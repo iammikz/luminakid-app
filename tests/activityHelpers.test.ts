@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   ANIMALS,
   areAllFlowersBloomed,
+  createBubbleVisual,
   createBubble,
   getNextFireflyDelay,
   getRandomFireflyTarget,
@@ -39,6 +40,28 @@ describe("activity helpers", () => {
     expect(bubble.y).toBeGreaterThanOrEqual(0);
     expect(bubble.x + bubble.size).toBeLessThanOrEqual(96);
     expect(bubble.y + bubble.size).toBeLessThanOrEqual(96);
+  });
+
+  it("creates a layered visual model for realistic bubbles", () => {
+    const visual = createBubbleVisual({
+      id: "bubble-1",
+      size: 120,
+      x: 48,
+      y: 72,
+      color: "#2E5BFF"
+    });
+
+    expect(visual.shellColor).toBe("rgba(46,91,255,0.2)");
+    expect(visual.rimColor).toBe("rgba(255,255,255,0.86)");
+    expect(visual.innerGlowSize).toBe(84);
+    expect(visual.mainHighlight).toEqual({ width: 34, height: 48, left: 25, top: 18 });
+    expect(visual.secondaryHighlight).toEqual({ width: 17, height: 17, right: 26, bottom: 30 });
+    expect(visual.wobbleDistance).toBeGreaterThanOrEqual(5);
+    expect(visual.wobbleDistance).toBeLessThanOrEqual(11);
+    expect(visual.wobbleDuration).toBeGreaterThanOrEqual(2400);
+    expect(visual.wobbleDuration).toBeLessThanOrEqual(3600);
+    expect(visual.rotationDegrees).toBeGreaterThanOrEqual(-6);
+    expect(visual.rotationDegrees).toBeLessThanOrEqual(6);
   });
 
   it("returns a random animal from the approved pool", () => {
