@@ -1,11 +1,7 @@
 const PLAY_TAB_DRAG_THRESHOLD = 36;
 
-export function shouldShowTabBar(routeName: string | undefined, playTabsExpanded: boolean): boolean {
-  if (routeName === "index") {
-    return playTabsExpanded;
-  }
-
-  return true;
+export function shouldShowTabBar(_routeName: string | undefined, tabsExpanded: boolean): boolean {
+  return tabsExpanded;
 }
 
 export function getNextPlayTabsExpanded(currentExpanded: boolean, translationY: number): boolean {

@@ -23,6 +23,13 @@ export interface Bounds {
   height: number;
 }
 
+export interface HittableCharacter {
+  id: string;
+  x: number;
+  y: number;
+  faded: boolean;
+}
+
 function unit(random: () => number): number {
   return Math.min(Math.max(random(), 0), 0.999999);
 }
@@ -66,4 +73,41 @@ export function moveCharacter(
     vx,
     vy
   };
+}
+
+export function findTopmostCharacterAt(
+  characters: HittableCharacter[],
+  x: number,
+  y: number,
+  size: number
+): string | undefined {
+  for (let index = characters.length - 1; index >= 0; index -= 1) {
+    const character = characters[index];
+    if (
+      !character.faded &&
+      x >= character.x &&
+      x <= character.x + size &&
+      y >= character.y &&
+      y <= character.y + size
+    ) {
+      return character.id;
+    }
+  }
+
+  return undefined;
+}
+
+export function createRandomCharacterPositions(
+  count: number,
+  bounds: Bounds,
+  size: number,
+  random = Math.random
+): Array<{ x: number; y: number }> {
+  const maxX = Math.max(0, bounds.width - size);
+  const maxY = Math.max(0, bounds.height - size);
+
+  return Array.from({ length: count }, () => ({
+    x: unit(random) * maxX,
+    y: unit(random) * maxY
+  }));
 }

@@ -25,3 +25,32 @@
 - P3: the automated screenshot round-trip is longer than the ephemeral particle animation, so active particles were verified through rendered DOM styles and node count rather than a frozen screenshot. Production timing was not extended for QA.
 
 final result: passed
+
+## Touch Hit, Round Reset, and Shared Tab Chrome — 2026-06-18
+
+### Tested States
+
+- Expo Web at `http://127.0.0.1:8081` with the 6-month Touch & Sparkle activity.
+- Portrait viewport at 390x844 with collapsed and expanded bottom navigation.
+- Wide viewport at 1280x800 on Play, Journal, and Settings.
+- Focused Vitest coverage for topmost hit selection, faded-character exclusion, misses, reset bounds, route-independent tab visibility, and drag thresholds.
+
+### Findings
+
+- Canvas-relative feedback: passed. Every visual descendant is non-interactive, the full-canvas press target receives the event, and rendered particle nodes originate from the press coordinates.
+- Character hit selection: passed. Focused tests confirm the last rendered visible character wins an overlap, faded characters are skipped, and misses return no character.
+- Round reset: passed. The sixth visible hit schedules one 320ms reset, creates six canvas-bounded randomized positions, restores every character's opacity, and preserves velocity.
+- Timer lifecycle: passed. Particle cleanup timers and the pending round-reset timer are cleared on unmount.
+- Narrow tab frame: passed. The expanded frame remains centered at 92% width in the 390px portrait viewport.
+- Wide tab frame: passed. At 1280px the rendered tab list measured 920px wide with equal 180px left and right gaps.
+- Shared routes: passed. Play, Journal, and Settings all render the same centered collapsible shell, and navigation between all three routes succeeds.
+- Console: no new application errors observed during route and viewport checks.
+
+### Severity Review
+
+- P0: none.
+- P1: none.
+- P2: none.
+- P3: the in-app browser driver could not synthesize React Native Web's `PanGestureHandler` drag or choose an arbitrary point inside the full-screen Pressable. Gesture state transitions and coordinate hit behavior were therefore verified through focused tests and implementation inspection; the rendered collapsed/expanded states and route layouts were verified in-browser.
+
+final result: passed

@@ -14,20 +14,13 @@ import { useTabChromeStore } from "../../src/store/useTabChromeStore";
 function CollapsibleTabBar(props: BottomTabBarProps) {
   const activeRouteName = props.state.routes[props.state.index]?.name;
   const playTabsExpanded = useTabChromeStore((state) => state.playTabsExpanded);
-  const collapsePlayTabs = useTabChromeStore((state) => state.collapsePlayTabs);
   const setPlayTabsExpanded = useTabChromeStore((state) => state.setPlayTabsExpanded);
-  const playRouteActive = activeRouteName === "index";
   const tabProgress = useSharedValue(playTabsExpanded ? 1 : 0);
+  const showTabBar = shouldShowTabBar(activeRouteName, playTabsExpanded);
 
   useEffect(() => {
-    if (playRouteActive) {
-      collapsePlayTabs();
-    }
-  }, [collapsePlayTabs, playRouteActive]);
-
-  useEffect(() => {
-    tabProgress.value = withTiming(playRouteActive && !playTabsExpanded ? 0 : 1, { duration: 260 });
-  }, [playRouteActive, playTabsExpanded, tabProgress]);
+    tabProgress.value = withTiming(showTabBar ? 1 : 0, { duration: 260 });
+  }, [showTabBar, tabProgress]);
 
   const animatedTabShellStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: (1 - tabProgress.value) * 116 }]
@@ -44,29 +37,23 @@ function CollapsibleTabBar(props: BottomTabBarProps) {
     }
   }
 
-  if (playRouteActive) {
-    return (
-      <PanGestureHandler onEnded={(event) => handlePlayTabDrag(Number(event.nativeEvent.translationY ?? 0))}>
-        <View pointerEvents="box-none" style={styles.tabBarOverlay}>
-          <Animated.View
-            pointerEvents="auto"
-            accessibilityLabel={playTabsExpanded ? "Drag down to collapse app navigation" : "Drag up to show app navigation"}
-            style={[styles.dragHandleZone, animatedHandleStyle]}
-          >
-            <View style={styles.dragHandle} />
-          </Animated.View>
-          <Animated.View pointerEvents={playTabsExpanded ? "auto" : "none"} style={[styles.playTabGroup, animatedTabShellStyle]}>
-            <BottomTabBar {...props} />
-          </Animated.View>
-        </View>
-      </PanGestureHandler>
-    );
-  }
-
   return (
-    <View pointerEvents="box-none" style={styles.tabBarOverlay}>
-      <BottomTabBar {...props} />
-    </View>
+    <PanGestureHandler onEnded={(event) => handlePlayTabDrag(Number(event.nativeEvent.translationY ?? 0))}>
+      <View pointerEvents="box-none" style={styles.tabBarOverlay}>
+        <Animated.View
+          pointerEvents="auto"
+          accessibilityLabel={playTabsExpanded ? "Drag down to collapse app navigation" : "Drag up to show app navigation"}
+          style={[styles.dragHandleZone, animatedHandleStyle]}
+        >
+          <View style={styles.dragHandle} />
+        </Animated.View>
+        <Animated.View pointerEvents={showTabBar ? "auto" : "none"} style={[styles.playTabGroup, animatedTabShellStyle]}>
+          <View style={styles.tabBarFrame}>
+            <BottomTabBar {...props} />
+          </View>
+        </Animated.View>
+      </View>
+    </PanGestureHandler>
   );
 }
 
@@ -81,10 +68,8 @@ export default function TabLayout() {
         tabBarStyle: {
           position: "absolute",
           minHeight: 88,
-          width: "92%",
-          maxWidth: 920,
-          alignSelf: "center",
-          marginHorizontal: 18,
+          width: "100%",
+          marginHorizontal: 0,
           marginBottom: 14,
           borderTopWidth: 0,
           borderRadius: RADIUS.xl,
@@ -158,6 +143,12 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    minHeight: 108
+    minHeight: 108,
+    alignItems: "center"
+  },
+  tabBarFrame: {
+    width: "92%",
+    maxWidth: 920,
+    height: 108
   }
 });

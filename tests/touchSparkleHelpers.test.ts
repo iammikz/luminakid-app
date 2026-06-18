@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   SPARKLE_COLORS,
+  createRandomCharacterPositions,
   createSparkles,
+  findTopmostCharacterAt,
   moveCharacter
 } from "../src/activities/touchSparkleHelpers";
 
@@ -45,5 +47,36 @@ describe("touch sparkle helpers", () => {
       vx: 2,
       vy: 2
     });
+  });
+
+  it("selects only the topmost visible character at a touch point", () => {
+    const characters = [
+      { id: "back", x: 20, y: 20, faded: false },
+      { id: "front", x: 20, y: 20, faded: false }
+    ];
+
+    expect(findTopmostCharacterAt(characters, 40, 40, 88)).toBe("front");
+  });
+
+  it("ignores faded characters and misses outside character bounds", () => {
+    const characters = [
+      { id: "back", x: 20, y: 20, faded: false },
+      { id: "front", x: 20, y: 20, faded: true }
+    ];
+
+    expect(findTopmostCharacterAt(characters, 40, 40, 88)).toBe("back");
+    expect(findTopmostCharacterAt(characters, 200, 200, 88)).toBeUndefined();
+  });
+
+  it("creates six reset positions inside the measured canvas", () => {
+    const positions = createRandomCharacterPositions(6, { width: 320, height: 640 }, 88, () => 0.5);
+
+    expect(positions).toHaveLength(6);
+    for (const position of positions) {
+      expect(position.x).toBeGreaterThanOrEqual(0);
+      expect(position.x).toBeLessThanOrEqual(232);
+      expect(position.y).toBeGreaterThanOrEqual(0);
+      expect(position.y).toBeLessThanOrEqual(552);
+    }
   });
 });

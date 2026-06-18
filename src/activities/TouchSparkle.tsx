@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
-import { Image, Pressable, StyleSheet } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { SHADOWS } from "../constants/theme";
@@ -8,7 +8,9 @@ import { useHaptics } from "../hooks/useHaptics";
 import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
 import {
+  createRandomCharacterPositions,
   createSparkles,
+  findTopmostCharacterAt,
   moveCharacter,
   type Bounds,
   type CharacterMotion,
@@ -17,19 +19,43 @@ import {
 
 const CHARACTER_SIZE = 88;
 const CHARACTER_TICK_MS = 32;
+const CHARACTER_FADE_MS = 320;
 
 interface MovingCharacter extends CharacterMotion {
   id: string;
+  faded: boolean;
 }
 
 const INITIAL_CHARACTERS: MovingCharacter[] = [
-  { id: "kitty-1", x: 18, y: 8, vx: 0.62, vy: 0.46 },
-  { id: "kitty-2", x: 188, y: 58, vx: -0.54, vy: 0.68 },
-  { id: "kitty-3", x: 78, y: 168, vx: 0.72, vy: -0.5 },
-  { id: "kitty-4", x: 210, y: 250, vx: -0.66, vy: -0.58 },
-  { id: "kitty-5", x: 22, y: 332, vx: 0.58, vy: -0.7 },
-  { id: "kitty-6", x: 144, y: 420, vx: -0.74, vy: 0.52 }
+  { id: "kitty-1", x: 18, y: 8, vx: 0.62, vy: 0.46, faded: false },
+  { id: "kitty-2", x: 188, y: 58, vx: -0.54, vy: 0.68, faded: false },
+  { id: "kitty-3", x: 78, y: 168, vx: 0.72, vy: -0.5, faded: false },
+  { id: "kitty-4", x: 210, y: 250, vx: -0.66, vy: -0.58, faded: false },
+  { id: "kitty-5", x: 22, y: 332, vx: 0.58, vy: -0.7, faded: false },
+  { id: "kitty-6", x: 144, y: 420, vx: -0.74, vy: 0.52, faded: false }
 ];
+
+function MovingKitty({ character }: { character: MovingCharacter }) {
+  const opacity = useSharedValue(character.faded ? 0 : 0.92);
+
+  useEffect(() => {
+    opacity.value = withTiming(character.faded ? 0 : 0.92, { duration: CHARACTER_FADE_MS });
+  }, [character.faded, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  return (
+    <Animated.Image
+      resizeMode="contain"
+      source={require("../assets/images/kindpng_6787158.png")}
+      style={[
+        styles.character,
+        { transform: [{ translateX: character.x }, { translateY: character.y }] },
+        animatedStyle
+      ]}
+    />
+  );
+}
 
 function SparkleParticle({ sparkle }: { sparkle: SparkleModel }) {
   const progress = useSharedValue(0);
@@ -74,6 +100,7 @@ export function TouchSparkle(_props: ActivityProps) {
   const [characters, setCharacters] = useState<MovingCharacter[]>(INITIAL_CHARACTERS);
   const [sparkles, setSparkles] = useState<SparkleModel[]>([]);
   const cleanupTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const burstSequence = useRef(0);
   const { light } = useHaptics();
   const chime = useSound("chime");
@@ -87,6 +114,7 @@ export function TouchSparkle(_props: ActivityProps) {
       setCharacters((current) =>
         current.map((character) => ({
           id: character.id,
+          faded: character.faded,
           ...moveCharacter(character, canvasSize, CHARACTER_SIZE)
         }))
       );
@@ -98,6 +126,9 @@ export function TouchSparkle(_props: ActivityProps) {
   useEffect(
     () => () => {
       cleanupTimers.current.forEach((timer) => clearTimeout(timer));
+      if (resetTimer.current) {
+        clearTimeout(resetTimer.current);
+      }
     },
     []
   );
@@ -118,10 +149,38 @@ export function TouchSparkle(_props: ActivityProps) {
         `${Date.now()}-${burstSequence.current}`
       );
       const cleanupDelay = Math.max(...nextSparkles.map((sparkle) => sparkle.duration)) + 50;
+      const hitCharacterId = findTopmostCharacterAt(characters, locationX, locationY, CHARACTER_SIZE);
 
       light();
       void chime.play();
       setSparkles((current) => [...current, ...nextSparkles]);
+
+      if (hitCharacterId) {
+        const finalVisibleCharacter = characters.filter((character) => !character.faded).length === 1;
+        setCharacters((current) =>
+          current.map((character) =>
+            character.id === hitCharacterId ? { ...character, faded: true } : character
+          )
+        );
+
+        if (finalVisibleCharacter && !resetTimer.current) {
+          resetTimer.current = setTimeout(() => {
+            const positions = createRandomCharacterPositions(
+              INITIAL_CHARACTERS.length,
+              canvasSize,
+              CHARACTER_SIZE
+            );
+            setCharacters((current) =>
+              current.map((character, index) => ({
+                ...character,
+                ...positions[index],
+                faded: false
+              }))
+            );
+            resetTimer.current = null;
+          }, CHARACTER_FADE_MS);
+        }
+      }
 
       const cleanupTimer = setTimeout(() => {
         const ids = new Set(nextSparkles.map((sparkle) => sparkle.id));
@@ -129,7 +188,7 @@ export function TouchSparkle(_props: ActivityProps) {
       }, cleanupDelay);
       cleanupTimers.current.push(cleanupTimer);
     },
-    [chime, light]
+    [canvasSize, characters, chime, light]
   );
 
   return (
@@ -139,27 +198,21 @@ export function TouchSparkle(_props: ActivityProps) {
       onPress={addSparkles}
       style={styles.canvas}
     >
-      <Image
-        resizeMode="cover"
-        source={require("../assets/images/touch-sparkle-background.png")}
-        style={styles.background}
-      />
-
-      {characters.map((character) => (
-        <Animated.Image
-          key={character.id}
-          resizeMode="contain"
-          source={require("../assets/images/kindpng_6787158.png")}
-          style={[
-            styles.character,
-            { transform: [{ translateX: character.x }, { translateY: character.y }] }
-          ]}
+      <View pointerEvents="none" style={styles.visualLayer}>
+        <Image
+          resizeMode="cover"
+          source={require("../assets/images/touch-sparkle-background.png")}
+          style={styles.background}
         />
-      ))}
 
-      {sparkles.map((sparkle) => (
-        <SparkleParticle key={sparkle.id} sparkle={sparkle} />
-      ))}
+        {characters.map((character) => (
+          <MovingKitty key={character.id} character={character} />
+        ))}
+
+        {sparkles.map((sparkle) => (
+          <SparkleParticle key={sparkle.id} sparkle={sparkle} />
+        ))}
+      </View>
     </Pressable>
   );
 }
@@ -177,13 +230,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%"
   },
+  visualLayer: {
+    ...StyleSheet.absoluteFillObject
+  },
   character: {
     position: "absolute",
     left: 0,
     top: 0,
     width: CHARACTER_SIZE,
-    height: CHARACTER_SIZE,
-    opacity: 0.92
+    height: CHARACTER_SIZE
   },
   sparkle: {
     position: "absolute",
