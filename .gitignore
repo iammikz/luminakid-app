@@ -7,3 +7,6 @@ yarn-debug.log*
 yarn-error.log*
 expo-server*.log
 .DS_Store
+
+
+.superpowers

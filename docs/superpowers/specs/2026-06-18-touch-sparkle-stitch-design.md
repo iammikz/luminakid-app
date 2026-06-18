@@ -8,9 +8,9 @@ This change does not alter activity routing, age gating, journal content, global
 
 ## Visual Design
 
-The activity canvas uses the Stitch reference composition: a soft green-to-teal-to-blue background, the Hello Kitty PNG as the primary moving target, a subtle light field behind the character, and the narrow vertical pink meter on the right. The canvas remains portrait-first, fills the existing activity slot, clips overflow, and requires no text comprehension from the child.
+The activity canvas uses the actual Stitch reference composition: a soft full-screen rainbow shader and six independently moving Hello Kitty instances. The canvas remains portrait-first, fills the existing activity slot, clips overflow, and requires no text comprehension from the child. The Stitch screen has no side meter.
 
-The character stays fully inside measured canvas bounds. It drifts continuously with gentle velocity, reverses direction at edges, and preserves the PNG aspect ratio. Motion must remain slow enough for a six-month-old to track and must not block touch-anywhere interaction.
+Each character preserves the PNG aspect ratio, drifts continuously with its own gentle velocity, and reverses direction at canvas edges. Partial edge clipping is allowed during reversal because it is present in the Stitch reference. Motion must remain slow enough for a six-month-old to track and must not block touch-anywhere interaction.
 
 ## Touch Interaction
 
@@ -19,17 +19,15 @@ Every press uses the local touch coordinates and immediately:
 1. triggers light haptic feedback;
 2. plays the existing chime through `useSound("chime")`;
 3. creates twelve square sparkle particles at the press position; and
-4. updates the right-side meter as lightweight visual feedback without introducing scoring or failure language.
+4. leaves the character motion uninterrupted so repeated touches layer sparkles over the moving scene.
 
 The React Native implementation translates Stitch's `createSparkle(x, y)` behavior rather than injecting its DOM code. Each burst uses the Stitch palette `#FF69B4`, `#00FFFF`, `#FFFF00`, `#FFFFFF`, and `#FFD700`. Particles use randomized 10–30px sizes, radial direction, 50–150px travel distance, glow matching their color, and an 800–1200ms fade-and-scale animation. Completed particles are removed from state.
 
-The meter is decorative response feedback, not progress toward an objective. It rises on touches and eases back so the activity continues indefinitely.
-
 ## Components and Data Flow
 
-- `TouchSparkle` owns measured canvas dimensions, character motion state, particle state, cleanup timers, sound, and haptics.
+- `TouchSparkle` owns measured canvas dimensions, six character motion models, particle state, cleanup timers, sound, and haptics.
 - `SparkleParticle` receives immutable particle geometry and animates translation, scale, and opacity with Reanimated.
-- `MovingCharacter` renders the bundled PNG and applies bounded position updates independently of touch bursts.
+- `MovingCharacter` renders one instance of the bundled PNG and applies bounded position updates independently of touch bursts.
 - Pure helper functions generate particle descriptors and calculate bounded character movement. Random generation is separated from rendering so it can be tested deterministically.
 
 A touch event flows from the full-canvas `Pressable` into particle generation and immediate feedback. Rendering consumes particle descriptors; timers remove them after their individual durations. Character animation runs independently so repeated touches do not reset its motion.
