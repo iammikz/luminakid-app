@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   ANIMALS,
+  BUBBLE_CANVAS_COLOR,
+  BUBBLE_HALO_HALF_CYCLE_MS,
+  BUBBLE_MAX_WOBBLE_AMPLITUDE,
   areAllFlowersBloomed,
   createBubbleVisual,
   createBubble,
@@ -56,12 +59,27 @@ describe("activity helpers", () => {
     expect(visual.innerGlowSize).toBe(84);
     expect(visual.mainHighlight).toEqual({ width: 34, height: 48, left: 25, top: 18 });
     expect(visual.secondaryHighlight).toEqual({ width: 17, height: 17, right: 26, bottom: 30 });
-    expect(visual.wobbleDistance).toBeGreaterThanOrEqual(5);
-    expect(visual.wobbleDistance).toBeLessThanOrEqual(11);
+    expect(visual.wobbleDistance).toBeGreaterThanOrEqual(12);
+    expect(visual.wobbleDistance).toBeLessThanOrEqual(18);
     expect(visual.wobbleDuration).toBeGreaterThanOrEqual(2400);
     expect(visual.wobbleDuration).toBeLessThanOrEqual(3600);
     expect(visual.rotationDegrees).toBeGreaterThanOrEqual(-6);
     expect(visual.rotationDegrees).toBeLessThanOrEqual(6);
+  });
+
+  it("keeps a bubble inside the canvas throughout its maximum wobble", () => {
+    const bubble = createBubble({ width: 320, height: 420 }, () => 0);
+
+    expect(bubble.y).toBeGreaterThanOrEqual(BUBBLE_MAX_WOBBLE_AMPLITUDE);
+    expect(bubble.y + bubble.size).toBeLessThanOrEqual(420 - BUBBLE_MAX_WOBBLE_AMPLITUDE);
+  });
+
+  it("uses a five-second full cycle for the breathing halo", () => {
+    expect(BUBBLE_HALO_HALF_CYCLE_MS * 2).toBe(5000);
+  });
+
+  it("uses a muted canvas color that contrasts with translucent bubbles", () => {
+    expect(BUBBLE_CANVAS_COLOR).toBe("#B9D2E8");
   });
 
   it("returns a random animal from the approved pool", () => {

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-import { COLORS, SHADOWS } from "../constants/theme";
+import { SHADOWS } from "../constants/theme";
 import { useHaptics } from "../hooks/useHaptics";
 import { useSound } from "../hooks/useSound";
 import type { ActivityProps } from "../types/activity";
 import type { BubbleModel, CanvasSize } from "./activityHelpers";
-import { createBubble, createBubbleVisual } from "./activityHelpers";
+import { BUBBLE_CANVAS_COLOR, BUBBLE_HALO_HALF_CYCLE_MS, createBubble, createBubbleVisual } from "./activityHelpers";
 
 interface BubbleState extends BubbleModel {
   popping: boolean;
@@ -17,6 +17,7 @@ interface BubbleState extends BubbleModel {
 function Bubble({ bubble, onPop }: { bubble: BubbleState; onPop: (id: string) => void }) {
   const progress = useSharedValue(0);
   const wobble = useSharedValue(0);
+  const halo = useSharedValue(0);
   const visual = createBubbleVisual(bubble);
 
   useEffect(() => {
@@ -26,12 +27,12 @@ function Bubble({ bubble, onPop }: { bubble: BubbleState; onPop: (id: string) =>
   }, [bubble.popping, progress]);
 
   useEffect(() => {
-    wobble.value = withRepeat(
-      withSequence(withTiming(1, { duration: visual.wobbleDuration }), withTiming(0, { duration: visual.wobbleDuration })),
-      -1,
-      true
-    );
+    wobble.value = withRepeat(withTiming(1, { duration: visual.wobbleDuration }), -1, true);
   }, [visual.wobbleDuration, wobble]);
+
+  useEffect(() => {
+    halo.value = withRepeat(withTiming(1, { duration: BUBBLE_HALO_HALF_CYCLE_MS }), -1, true);
+  }, [halo]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: 1 - progress.value,
@@ -40,6 +41,11 @@ function Bubble({ bubble, onPop }: { bubble: BubbleState; onPop: (id: string) =>
       { rotate: `${visual.rotationDegrees + wobble.value * 2}deg` },
       { scale: 1 + progress.value * 0.4 }
     ]
+  }));
+
+  const haloAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: 0.32 + halo.value * 0.18,
+    transform: [{ scale: 1.04 + halo.value * 0.08 }]
   }));
 
   return (
@@ -51,53 +57,63 @@ function Bubble({ bubble, onPop }: { bubble: BubbleState; onPop: (id: string) =>
           top: bubble.y,
           width: bubble.size,
           height: bubble.size,
-          borderRadius: bubble.size / 2,
-          backgroundColor: visual.shellColor,
-          borderColor: visual.rimColor
+          borderRadius: bubble.size / 2
         },
         animatedStyle
       ]}
     >
-      <Pressable style={styles.bubblePressable} onPress={() => onPop(bubble.id)}>
-        <View
-          pointerEvents="none"
-          style={[
-            styles.innerGlow,
-            {
-              width: visual.innerGlowSize,
-              height: visual.innerGlowSize,
-              borderRadius: visual.innerGlowSize / 2
-            }
-          ]}
-        />
-        <View
-          pointerEvents="none"
-          style={[
-            styles.mainHighlight,
-            {
-              width: visual.mainHighlight.width,
-              height: visual.mainHighlight.height,
-              left: visual.mainHighlight.left,
-              top: visual.mainHighlight.top,
-              borderRadius: visual.mainHighlight.width
-            }
-          ]}
-        />
-        <View
-          pointerEvents="none"
-          style={[
-            styles.secondaryHighlight,
-            {
-              width: visual.secondaryHighlight.width,
-              height: visual.secondaryHighlight.height,
-              right: visual.secondaryHighlight.right,
-              bottom: visual.secondaryHighlight.bottom,
-              borderRadius: visual.secondaryHighlight.width / 2
-            }
-          ]}
-        />
-        <View pointerEvents="none" style={styles.lowerRim} />
-      </Pressable>
+      <Animated.View pointerEvents="none" style={[styles.halo, haloAnimatedStyle]} />
+      <View
+        style={[
+          styles.bubbleShell,
+          {
+            borderRadius: bubble.size / 2,
+            backgroundColor: visual.shellColor,
+            borderColor: visual.rimColor
+          }
+        ]}
+      >
+        <Pressable style={styles.bubblePressable} onPress={() => onPop(bubble.id)}>
+          <View
+            pointerEvents="none"
+            style={[
+              styles.innerGlow,
+              {
+                width: visual.innerGlowSize,
+                height: visual.innerGlowSize,
+                borderRadius: visual.innerGlowSize / 2
+              }
+            ]}
+          />
+          <View
+            pointerEvents="none"
+            style={[
+              styles.mainHighlight,
+              {
+                width: visual.mainHighlight.width,
+                height: visual.mainHighlight.height,
+                left: visual.mainHighlight.left,
+                top: visual.mainHighlight.top,
+                borderRadius: visual.mainHighlight.width
+              }
+            ]}
+          />
+          <View
+            pointerEvents="none"
+            style={[
+              styles.secondaryHighlight,
+              {
+                width: visual.secondaryHighlight.width,
+                height: visual.secondaryHighlight.height,
+                right: visual.secondaryHighlight.right,
+                bottom: visual.secondaryHighlight.bottom,
+                borderRadius: visual.secondaryHighlight.width / 2
+              }
+            ]}
+          />
+          <View pointerEvents="none" style={styles.lowerRim} />
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
@@ -172,18 +188,24 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 380,
     overflow: "hidden",
-    backgroundColor: "#DFF6FF",
+    backgroundColor: BUBBLE_CANVAS_COLOR,
     ...SHADOWS.card
   },
   bubble: {
+    position: "absolute"
+  },
+  halo: {
     position: "absolute",
+    inset: -8,
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.32)",
+    borderWidth: 4,
+    borderColor: "rgba(255,255,255,0.42)"
+  },
+  bubbleShell: {
+    flex: 1,
     overflow: "hidden",
-    borderWidth: 2,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.24,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 6
+    borderWidth: 2
   },
   bubblePressable: {
     minWidth: 88,

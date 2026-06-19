@@ -57,6 +57,10 @@ export const ANIMALS: Animal[] = [
 const BUBBLE_COLORS = ["#2E5BFF", "#FFD23F", "#FF9F89", "#B8C3FF", "#DDF7ED"];
 const PASTELS = ["#EEF1FF", "#DDF7ED", "#FFEFB0", "#FFE1DA", "#DFF6FF", "#EEE9FF"];
 
+export const BUBBLE_MAX_WOBBLE_AMPLITUDE = 9;
+export const BUBBLE_HALO_HALF_CYCLE_MS = 2500;
+export const BUBBLE_CANVAS_COLOR = "#B9D2E8";
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
@@ -114,12 +118,16 @@ export function createBubble(canvas: CanvasSize, random = Math.random): BubbleMo
   const size = Math.round(80 + random() * (maxUsableSize - 80));
   const maxX = Math.max(0, canvas.width - size);
   const maxY = Math.max(0, canvas.height - size);
+  const wobbleSafeHeight = maxY - BUBBLE_MAX_WOBBLE_AMPLITUDE * 2;
+  const y = wobbleSafeHeight >= 0
+    ? BUBBLE_MAX_WOBBLE_AMPLITUDE + Math.round(random() * wobbleSafeHeight)
+    : Math.round(random() * maxY);
 
   return {
     id: `${Date.now()}-${Math.round(random() * 1_000_000)}`,
     size,
     x: Math.round(random() * maxX),
-    y: Math.round(random() * maxY),
+    y,
     color: BUBBLE_COLORS[pickIndex(BUBBLE_COLORS.length, random)]
   };
 }
@@ -146,7 +154,7 @@ export function createBubbleVisual(bubble: BubbleModel): BubbleVisual {
       right: Math.round(bubble.size * 0.22),
       bottom: Math.round(bubble.size * 0.25)
     },
-    wobbleDistance: 5 + drift,
+    wobbleDistance: 12 + drift,
     wobbleDuration: 2400 + (seed % 1201),
     rotationDegrees: rotation
   };
