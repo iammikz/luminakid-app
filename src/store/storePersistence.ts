@@ -1,6 +1,7 @@
 import { isValid, parseISO } from "date-fns";
 
 import { ACTIVITY_CATALOG } from "../engine/activityCatalog";
+import { updateBabyProfile } from "../engine/onboarding";
 import type { BabyProfile } from "../types/baby";
 
 export interface PersistedBabyState {
@@ -52,5 +53,17 @@ export function sanitizePersistedBabyState(value: unknown): PersistedBabyState {
     baby: sanitizeBabyProfile(value.baby),
     selectedMonth: sanitizeSelectedMonth(value.selectedMonth),
     peekabooVoiceUri: sanitizeVoiceUri(value.peekabooVoiceUri)
+  };
+}
+
+export function updatePersistedBabyProfile(
+  state: PersistedBabyState,
+  name: string,
+  dateOfBirth: string
+): PersistedBabyState {
+  return {
+    ...state,
+    baby: state.baby ? updateBabyProfile(state.baby, name, dateOfBirth) : null,
+    selectedMonth: null
   };
 }

@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system/legacy";
+import { useRouter } from "expo-router";
 
 import { AppScreen } from "../../src/components/AppScreen";
 import { ElevatedSurface } from "../../src/components/ElevatedSurface";
@@ -17,6 +18,7 @@ import {
 import { useBabyStore } from "../../src/store/useBabyStore";
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const savedVoiceUri = useBabyStore((state) => state.peekabooVoiceUri);
   const setPeekabooVoiceUri = useBabyStore((state) => state.setPeekabooVoiceUri);
   const [pendingVoiceUri, setPendingVoiceUri] = useState<string | null>(savedVoiceUri);
@@ -141,6 +143,20 @@ export default function SettingsScreen() {
             Re-record
           </TactileButton>
         </ElevatedSurface>
+
+        <ElevatedSurface tone="lavender" style={styles.profilePanel}>
+          <View style={styles.profileCopy}>
+            <Text style={styles.sectionTitle}>Baby profile</Text>
+            <Text style={styles.copy}>Update your baby's name or date of birth.</Text>
+          </View>
+          <TactileButton
+            accessibilityLabel="Edit baby profile"
+            onPress={() => router.push({ pathname: "/setup", params: { mode: "edit" } })}
+            style={styles.fullAction}
+          >
+            Edit profile
+          </TactileButton>
+        </ElevatedSurface>
       </ScrollView>
     </AppScreen>
   );
@@ -173,6 +189,16 @@ const styles = StyleSheet.create({
   panel: {
     alignItems: "center",
     gap: SPACING.lg
+  },
+  profilePanel: {
+    gap: SPACING.lg
+  },
+  profileCopy: {
+    gap: SPACING.sm
+  },
+  sectionTitle: {
+    ...TYPOGRAPHY.h2,
+    color: COLORS.primaryDark
   },
   recordButton: {
     width: 180,

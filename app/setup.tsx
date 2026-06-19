@@ -1,20 +1,31 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { AppScreen } from "../src/components/AppScreen";
+import { BirthDateField } from "../src/components/BirthDateField";
 import { DepthBackdrop } from "../src/components/DepthBackdrop";
 import { ElevatedSurface } from "../src/components/ElevatedSurface";
 import { TactileButton } from "../src/components/TactileButton";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../src/constants/theme";
-import { createBabyProfile, getMonthsUntilFirstActivity, validateDateOfBirth } from "../src/engine/onboarding";
+import {
+  DEFAULT_BABY_NAME,
+  DEFAULT_DATE_OF_BIRTH,
+  createBabyProfile,
+  getMonthsUntilFirstActivity,
+  validateDateOfBirth
+} from "../src/engine/onboarding";
 import { useBabyStore } from "../src/store/useBabyStore";
 
 export default function SetupScreen() {
   const router = useRouter();
+  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const baby = useBabyStore((state) => state.baby);
   const setBaby = useBabyStore((state) => state.setBaby);
-  const [name, setName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const updateBaby = useBabyStore((state) => state.updateBaby);
+  const isEditing = mode === "edit" && baby !== null;
+  const [name, setName] = useState(isEditing ? baby.name : DEFAULT_BABY_NAME);
+  const [dateOfBirth, setDateOfBirth] = useState(isEditing ? baby.dateOfBirth : DEFAULT_DATE_OF_BIRTH);
   const [error, setError] = useState<string | null>(null);
   const [monthsUntilFirstActivity, setMonthsUntilFirstActivity] = useState<number | null>(null);
 
@@ -25,7 +36,11 @@ export default function SetupScreen() {
       return;
     }
     setError(null);
-    setBaby(createBabyProfile(name, dateOfBirth));
+    if (isEditing) {
+      updateBaby(name, dateOfBirth);
+    } else {
+      setBaby(createBabyProfile(name, dateOfBirth));
+    }
     const monthsUntilUnlock = getMonthsUntilFirstActivity(dateOfBirth);
     if (monthsUntilUnlock > 0) {
       setMonthsUntilFirstActivity(monthsUntilUnlock);
@@ -55,11 +70,18 @@ export default function SetupScreen() {
   }
 
   return (
-    <AppScreen>
-      <ElevatedSurface style={styles.card}>
+    <AppScreen centered={false} style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <ElevatedSurface style={styles.card}>
         <DepthBackdrop />
         <Text style={styles.brand}>LuminaKid</Text>
-        <Text style={styles.title}>Set up your baby's first activity path</Text>
+        <Text style={styles.title}>
+          {isEditing ? "Edit your baby's profile" : "Set up your baby's first activity path"}
+        </Text>
         <Text style={styles.copy}>
           Enter a birth date once. LuminaKid will open the right activity month by month.
         </Text>
@@ -70,7 +92,7 @@ export default function SetupScreen() {
             accessibilityLabel="Baby name"
             value={name}
             onChangeText={setName}
-            placeholder="Your baby"
+            placeholder={DEFAULT_BABY_NAME}
             style={styles.input}
             autoCapitalize="words"
           />
@@ -78,25 +100,39 @@ export default function SetupScreen() {
 
         <View style={styles.field}>
           <Text style={styles.label}>Date of birth</Text>
-          <TextInput
-            accessibilityLabel="Date of birth"
-            value={dateOfBirth}
-            onChangeText={setDateOfBirth}
-            placeholder="YYYY-MM-DD"
-            style={styles.input}
-            keyboardType="numbers-and-punctuation"
-          />
+          <BirthDateField value={dateOfBirth} onChange={setDateOfBirth} />
         </View>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TactileButton accessibilityLabel="Continue setup" onPress={save}>Continue</TactileButton>
-      </ElevatedSurface>
+        <TactileButton accessibilityLabel={isEditing ? "Save profile" : "Continue setup"} onPress={save}>
+          {isEditing ? "Save profile" : "Continue"}
+        </TactileButton>
+        {isEditing ? (
+          <TactileButton
+            accessibilityLabel="Cancel profile editing"
+            onPress={() => router.back()}
+            variant="secondary"
+          >
+            Cancel
+          </TactileButton>
+        ) : null}
+        </ElevatedSurface>
+      </ScrollView>
     </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    paddingHorizontal: 0
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: SPACING.mobileMargin,
+    paddingVertical: SPACING.lg
+  },
   card: {
     overflow: "hidden",
     width: "100%",

@@ -2,12 +2,23 @@ import { differenceInMonths, isAfter, isValid, parseISO } from "date-fns";
 
 import type { BabyProfile } from "../types/baby";
 
+export const DEFAULT_BABY_NAME = "Sophia";
+export const DEFAULT_DATE_OF_BIRTH = "2025-12-04";
+
 export function createBabyProfile(name: string, dateOfBirth: string, now = new Date()): BabyProfile {
   return {
     id: `${now.getTime()}`,
-    name: name.trim() || "Your baby",
+    name: name.trim() || DEFAULT_BABY_NAME,
     dateOfBirth,
     createdAt: now.toISOString()
+  };
+}
+
+export function updateBabyProfile(profile: BabyProfile, name: string, dateOfBirth: string): BabyProfile {
+  return {
+    ...profile,
+    name: name.trim() || DEFAULT_BABY_NAME,
+    dateOfBirth
   };
 }
 

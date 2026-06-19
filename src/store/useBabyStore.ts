@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { sanitizePersistedBabyState } from "./storePersistence";
+import { sanitizePersistedBabyState, updatePersistedBabyProfile } from "./storePersistence";
 import type { BabyProfile } from "../types/baby";
 
 interface BabyStore {
@@ -10,6 +10,7 @@ interface BabyStore {
   selectedMonth: number | null;
   peekabooVoiceUri: string | null;
   setBaby: (baby: BabyProfile) => void;
+  updateBaby: (name: string, dateOfBirth: string) => void;
   setSelectedMonth: (month: number | null) => void;
   setPeekabooVoiceUri: (uri: string | null) => void;
   clearBaby: () => void;
@@ -22,6 +23,8 @@ export const useBabyStore = create<BabyStore>()(
       selectedMonth: null,
       peekabooVoiceUri: null,
       setBaby: (baby) => set({ baby }),
+      updateBaby: (name, dateOfBirth) =>
+        set((state) => updatePersistedBabyProfile(state, name, dateOfBirth)),
       setSelectedMonth: (month) => set({ selectedMonth: month }),
       setPeekabooVoiceUri: (uri) => set({ peekabooVoiceUri: uri }),
       clearBaby: () => set({ baby: null, selectedMonth: null, peekabooVoiceUri: null })
