@@ -33,8 +33,29 @@ describe("sound assets", () => {
     expect(isSupportedSoundKey("missing")).toBe(false);
   });
 
-  it("returns null instead of throwing when optional development media is missing", () => {
-    expect(getOptionalSoundAsset("chime")).toBeNull();
+  it("returns mapped assets for the sound files currently installed", () => {
+    const installedKeys = [
+      "chime",
+      "pop",
+      "success",
+      "cow",
+      "dog",
+      "cat",
+      "pig",
+      "duck",
+      "frog",
+      "sheep",
+      "horse"
+    ] as const;
+
+    installedKeys.forEach((key) => expect(getOptionalSoundAsset(key)).not.toBeNull());
+  });
+
+  it("returns null for word recordings that have not been installed", () => {
+    expect(getOptionalSoundAsset("ball")).toBeNull();
+    expect(getOptionalSoundAsset("milk")).toBeNull();
+    expect(getOptionalSoundAsset("mama")).toBeNull();
+    expect(getOptionalSoundAsset("dada")).toBeNull();
     expect(getOptionalSoundAsset("missing")).toBeNull();
   });
 });
